@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login Request</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <script>
+            $(document).ready(function () {
+                $("#loginForm").submit(function (event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: "https://menswear.dev/api/v1/admin/login",
+                        type: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": "",
+                        },
+                        data: JSON.stringify({
+                            email: "admin@example.com",
+                            password: "admin123",
+                            device_name: "android",
+                        }),
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            // Handle successful login response
+                            console.log(response.token);
+                            // Make a request to the get endpoint
+                            $.ajax({
+                                url: 'https://menswear.dev/api/v1/admin/catalog/categories',
+                                type: 'GET',
+                                dataType: "json",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    'Authorization': 'Bearer ' + response.token.split('|')[1],
+                                    'Accept': 'application/json',
+                                    "X-CSRF-TOKEN": "",
+                                },
+                                success: function(response) {
+                                    // Handle successful response
+                                    console.log(response);
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle error
+                                    console.error(error);
+                                }
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle login error
+                            console.error(error);
+                        },
+                    });
+                });
+            });
+        </script>
+
+        <form id="loginForm">
+            <label for="email">Email:</label><br />
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="admin@example.com"
+            /><br />
+            <label for="password">Password:</label><br />
+            <input
+                type="password"
+                id="password"
+                name="password"
+                value="admin123"
+            /><br /><br />
+            <input type="submit" value="Submit" />
+        </form>
+    </body>
+</html>

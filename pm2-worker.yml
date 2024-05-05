@@ -1,0 +1,34 @@
+apps:
+  - name: suryaethnicapi-schedule-work
+    interpreter: php
+    script: artisan
+    exec_mode: fork
+    instances: 1
+    autorestart: false
+    cron_restart: "* * * * *"
+    combine_logs: true
+    max_memory_restart:  "200M"
+    error_file: "/var/www/html/menswear-laravel-api-server/suryaethnicapi-schedule-work-err.log"
+    out_file: "/var/www/html/menswear-laravel-api-server/suryaethnicapi-schedule-work-out.log"
+    combine_logs: true
+    args:
+      - schedule:run
+
+  - name: suryaethnicapi-queue-work
+    interpreter: php
+    script: artisan
+    exec_mode: fork
+    instances: 3
+    autorestart: true
+    restart_delay: 0
+    cron_restart: "0 11 * * *"
+    combine_logs: true
+    max_memory_restart:  "200M"
+    error_file: "/var/www/html/menswear-laravel-api-server/suryaethnicapi-queue-work-err.log"
+    out_file: "/var/www/html/menswear-laravel-api-server/suryaethnicapi-queue-work-out.log"
+    combine_logs: true
+    args:
+      - queue:work
+      - database
+      - --tries=3
+      - --sleep=3
