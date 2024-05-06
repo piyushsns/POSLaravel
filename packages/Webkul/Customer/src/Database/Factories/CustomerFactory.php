@@ -4,6 +4,7 @@ namespace Webkul\Customer\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Webkul\Customer\Models\Customer;
 
@@ -37,9 +38,9 @@ class CustomerFactory extends Factory
             'first_name'        => $this->faker->firstName(),
             'last_name'         => $this->faker->lastName,
             'gender'            => Arr::random(['male', 'female', 'other']),
-            'email'             => $this->faker->email,
+            'email'             => Str::lower($this->faker->firstName().'@example.com'),
             'status'            => 1,
-            'password'          => Hash::make($this->faker->password),
+            'password'          => bcrypt("password"),
             'customer_group_id' => 2,
             'is_verified'       => 1,
             'created_at'        => now(),

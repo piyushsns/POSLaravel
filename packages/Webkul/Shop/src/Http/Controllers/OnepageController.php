@@ -5,6 +5,7 @@ namespace Webkul\Shop\Http\Controllers;
 use Illuminate\Support\Facades\Event;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\MagicAI\Facades\MagicAI;
+use Webkul\Sales\Models\Order;
 
 class OnepageController extends Controller
 {
@@ -82,15 +83,18 @@ class OnepageController extends Controller
      */
     public function success()
     {
-        if (! $order = session('order')) {
+        if (! $order = session('order') || !request()->has('current_order_id')) {
             return redirect()->route('shop.checkout.cart.index');
         }
-
         if (
             core()->getConfigData('general.magic_ai.settings.enabled')
             && core()->getConfigData('general.magic_ai.checkout_message.enabled')
             && ! empty(core()->getConfigData('general.magic_ai.checkout_message.prompt'))
         ) {
+
+            if (request()->has('current_order_id')) {
+                $order = Order::find(request()->get('current_order_id'));
+            }
 
             try {
                 $model = core()->getConfigData('general.magic_ai.checkout_message.model');

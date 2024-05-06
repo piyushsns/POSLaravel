@@ -49,7 +49,7 @@ trait CartTools
      */
     public function mergeCart(): void
     {
-        if (session()->has('cart')) {
+        if (session()->has('cart') || request()->has('current_cart_id')) {
             $user = auth()->guard()->user();
 
             $cart = $this->cartRepository->findOneWhere([
@@ -60,6 +60,10 @@ trait CartTools
             $this->setCart($cart);
 
             $guestCart = $this->cartRepository->find(session()->get('cart')->id);
+
+            if (request()->has('current_cart_id')) {
+                $guestCart = $this->cartRepository->find(request()->get('current_cart_id')->id);
+            }
 
             /**
              * When the logged in customer is not having any of the cart instance previously and are active.

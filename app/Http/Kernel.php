@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Http\Middleware\TransformAPIHeaders;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Session\Middleware\StartSession;
 
 class Kernel extends HttpKernel
 {
@@ -44,7 +45,8 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            TransformAPIHeaders::class
+            TransformAPIHeaders::class,
+            \Illuminate\Session\Middleware\StartSession::class,
         ],
     ];
 

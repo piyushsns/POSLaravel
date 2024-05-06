@@ -5,6 +5,7 @@ namespace Webkul\Shop\Http\Controllers\API;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Customer\Repositories\WishlistRepository;
@@ -84,7 +85,6 @@ class CartController extends APIController
 
                 if (request()->get('is_buy_now')) {
                     Event::dispatch('shop.item.buy-now', request()->input('product_id'));
-
                     return new JsonResource([
                         'data'     => new CartResource(Cart::getCart()),
                         'redirect' => route('shop.checkout.onepage.index'),
@@ -92,9 +92,12 @@ class CartController extends APIController
                     ]);
                 }
 
+                session()->put('info');
                 return new JsonResource([
                     'data'     => new CartResource(Cart::getCart()),
                     'message'  => trans('shop::app.checkout.cart.item-add-to-cart'),
+                    "info" => session()->get('info'),
+                    'current_cart_id' => $cart->id,
                 ]);
             }
         } catch (\Exception $exception) {
@@ -161,7 +164,6 @@ class CartController extends APIController
     {
         try {
             Cart::updateItems(request()->input());
-
             return new JsonResource([
                 'data'    => new CartResource(Cart::getCart()),
                 'message' => trans('shop::app.checkout.cart.index.quantity-update'),

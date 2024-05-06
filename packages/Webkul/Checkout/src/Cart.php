@@ -4,9 +4,11 @@ namespace Webkul\Checkout;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Webkul\Checkout\Contracts\CartAddress as CartAddressContract;
 use Webkul\Checkout\Exceptions\BillingAddressNotFoundException;
 use Webkul\Checkout\Models\CartAddress;
+use Webkul\Checkout\Models\CartItem;
 use Webkul\Checkout\Models\CartPayment;
 use Webkul\Checkout\Repositories\CartAddressRepository;
 use Webkul\Checkout\Repositories\CartItemRepository;
@@ -62,10 +64,10 @@ class Cart
      */
     public function getCart(): ?Contracts\Cart
     {
+
         if ($this->cart) {
             return $this->cart;
         }
-
         if (auth()->guard()->check()) {
             $this->cart = $this->cartRepository->findOneWhere([
                 'customer_id' => auth()->guard()->user()->id,
@@ -73,8 +75,9 @@ class Cart
             ]);
         } elseif (session()->has('cart')) {
             $this->cart = $this->cartRepository->find(session()->get('cart')->id);
+        } elseif (request()->has('current_cart_id')) {
+            $this->cart = $this->cartRepository->find(request()->get('current_cart_id'));
         }
-
         return $this->cart;
     }
 
@@ -304,8 +307,19 @@ class Cart
      */
     public function updateItems($data)
     {
-        foreach ($data['qty'] as $itemId => $quantity) {
-            $item = $this->cartItemRepository->find($itemId);
+        foreach ($data['qty'] as $itemId => $itemIterator) {
+
+            $item = CartItem::find($itemId);
+
+            $item_price = isset($itemIterator['price']) ?  $itemIterator['price']: $item->price;
+
+            $item_weight = isset($itemIterator['weight']) ?  $itemIterator['weight']: $item->weight;
+
+            $quantity = isset($itemIterator['quantity']) ?  $itemIterator['quantity']: $item->quantity;
+
+            $item_making_charges = isset($itemIterator['making_charges_amount']) ?  $itemIterator['making_charges_amount']: $item->making_charges_amount;
+
+            $item_other_charges = isset($itemIterator['other_amount']) ?  $itemIterator['other_amount']: $item->other_amount;
 
             if (! $item) {
                 continue;
@@ -329,15 +343,29 @@ class Cart
 
             Event::dispatch('checkout.cart.update.before', $item);
 
-            $this->cartItemRepository->update([
+            $item->update([
                 'quantity'          => $quantity,
-                'total'             => core()->convertPrice($item->price * $quantity),
-                'base_total'        => $item->price * $quantity,
-                'total_weight'      => $item->weight * $quantity,
-                'base_total_weight' => $item->weight * $quantity,
-            ], $itemId);
 
-            Event::dispatch('checkout.cart.update.after', $item);
+                'custom_price'             => $item_price,
+
+                'total'             => ($item_price * $item_weight) * $quantity,
+                'base_total'        => ($item_price * $item_weight) * $quantity,
+
+                'weight'            => $item_weight,
+
+                'total_weight'      => $item_weight * $quantity,
+                'base_total_weight' => $item_weight * $quantity,
+
+                'making_charges_amount'       => $item_making_charges,
+                'base_making_charges_amount'  => $item_making_charges,
+
+                'other_amount'      => $item_other_charges,
+                'base_other_amount' => $item_other_charges,
+            ]);
+
+            Log::info($item);
+
+            // Event::dispatch('checkout.cart.update.after', $item);
         }
 
         $this->collectTotals();
@@ -554,6 +582,12 @@ class Cart
             $cart->discount_amount += $item->discount_amount;
             $cart->base_discount_amount += $item->base_discount_amount;
 
+            $cart->making_charges_amount += round($item->making_charges_amount, 2);
+            $cart->base_making_charges_amount += round($item->base_making_charges_amount, 2);
+
+            $cart->other_amount = round($cart->other_amount, 2);
+            $cart->base_other_amount = round($cart->base_other_amount, 2);
+
             $cart->sub_total = (float) $cart->sub_total + $item->total;
             $cart->base_sub_total = (float) $cart->base_sub_total + $item->base_total;
 
@@ -586,6 +620,12 @@ class Cart
 
         $cart->grand_total = round($cart->grand_total, 2);
         $cart->base_grand_total = round($cart->base_grand_total, 2);
+
+        $cart->making_charges_amount = round($cart->making_charges_amount, 2);
+        $cart->base_making_charges_amount = round($cart->base_making_charges_amount, 2);
+
+        $cart->other_amount = round($cart->other_amount, 2);
+        $cart->base_other_amount = round($cart->base_other_amount, 2);
 
         $cart->cart_currency_code = core()->getCurrentCurrencyCode();
 
@@ -631,8 +671,10 @@ class Cart
                 $this->cartItemRepository->update([
                     'price'      => core()->convertPrice($price),
                     'base_price' => $price,
-                    'total'      => core()->convertPrice($price * $item->quantity),
-                    'base_total' => $price * $item->quantity,
+                    'total'             => ($price * $item->weight) * $item->quantity,
+                    'base_total'        => ($price * $item->weight) * $item->quantity,
+                    // 'total'      => core()->convertPrice($price * $item->quantity),
+                    // 'base_total' => $price * $item->quantity,
                 ], $item->id);
             }
 

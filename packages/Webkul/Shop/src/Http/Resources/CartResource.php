@@ -47,6 +47,12 @@ class CartResource extends JsonResource
             'shipping_address'               => $this->shipping_address,
             'have_stockable_items'           => $this->haveStockableItems(),
             'payment_method'                 => $this->payment ? core()->getConfigData('sales.payment_methods.'.$this->payment->method.'.title') : '',
+            'making_charges_amount'          => $this->making_charges_amount,
+            'base_making_charges_amount'     => $this->base_making_charges_amount,
+            'other_amount'                   => $this->other_amount,
+            'base_other_amount'              => $this->base_other_amount,
+            'total_weight'                   => $this->total_weight,
+            'base_total_weight'              => $this->base_total_weight,
         ];
     }
 }

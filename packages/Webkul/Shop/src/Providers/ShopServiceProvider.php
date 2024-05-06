@@ -24,7 +24,7 @@ class ShopServiceProvider extends ServiceProvider
     {
         /* loaders */
         Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
-        Route::middleware('web')->group(__DIR__.'/../Routes/api.php');
+        Route::middleware('api')->group(__DIR__.'/../Routes/api.php');
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
         $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'shop');
