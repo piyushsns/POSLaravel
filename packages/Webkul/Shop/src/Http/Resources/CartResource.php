@@ -53,6 +53,13 @@ class CartResource extends JsonResource
             'base_other_amount'              => $this->base_other_amount,
             'total_weight'                   => $this->total_weight,
             'base_total_weight'              => $this->base_total_weight,
+            'cgst_total'              => core()->formatPrice($this->cgst_total),
+            'base_cgst_total'              => $this->base_cgst_total,
+            'sgst_total'              => core()->formatPrice($this->sgst_total),
+            'base_sgst_total'              => $this->base_sgst_total,
+            'cgst_percent' =>            (float) $this->cgst_percent,
+            'sgst_percent' =>        (float) $this->sgst_percent
+
         ];
     }
 }

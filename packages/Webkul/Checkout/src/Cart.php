@@ -591,6 +591,9 @@ class Cart
             $cart->sub_total = (float) $cart->sub_total + $item->total;
             $cart->base_sub_total = (float) $cart->base_sub_total + $item->base_total;
 
+            $cart->cgst_percent = (float) $item->tax_percent;
+            $cart->sgst_percent = (float) $item->tax_percent;
+
             $quantities += $item->quantity;
         }
 
@@ -598,8 +601,16 @@ class Cart
 
         $cart->items_count = $cart->items->count();
 
-        $cart->tax_total = Tax::getTaxTotal($cart, false);
-        $cart->base_tax_total = Tax::getTaxTotal($cart, true);
+        $cart->cgst_total = Tax::getTaxTotal($cart, false);
+        $cart->base_cgst_total = Tax::getTaxTotal($cart, true);
+        $cart->sgst_total = Tax::getTaxTotal($cart, false);
+        $cart->base_sgst_total = Tax::getTaxTotal($cart, true);
+
+        $totalTax = Tax::getTaxTotal($cart, false) + Tax::getTaxTotal($cart, false);
+        $basetotalTax = Tax::getTaxTotal($cart, true) + Tax::getTaxTotal($cart, true);
+
+        $cart->tax_total = $totalTax;
+        $cart->base_tax_total = $basetotalTax;
 
         $cart->grand_total = $cart->sub_total + $cart->tax_total - $cart->discount_amount;
         $cart->base_grand_total = $cart->base_sub_total + $cart->base_tax_total - $cart->base_discount_amount;
@@ -737,6 +748,14 @@ class Cart
                 $item->tax_amount = round(($item->total * $rate->tax_rate) / 100, 4);
 
                 $item->base_tax_amount = round(($item->base_total * $rate->tax_rate) / 100, 4);
+
+                $item->sgst_amount = round(($item->total * $rate->tax_rate) / 100, 4);
+
+                $item->base_sgst_amount = round(($item->base_total * $rate->tax_rate) / 100, 4);
+
+                $item->cgst_amount = round(($item->total * $rate->tax_rate) / 100, 4);
+
+                $item->base_cgst_amount = round(($item->base_total * $rate->tax_rate) / 100, 4);
             });
 
             $item->save();
