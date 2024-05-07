@@ -33,10 +33,10 @@
             <div class="flex items-center relative w-[525px] max-w-[525px] ltr:ml-2.5 rtl:mr-2.5 max-lg:w-[400px]">
                 <i class="icon-search absolute flex items-center ltr:left-3 rtl:right-3 text-2xl top-1.5"></i>
 
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     class="w-full px-10 py-1.5 block bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-lg leading-6 text-gray-600 dark:text-gray-300 transition-all hover:border-gray-400"
-                    placeholder="@lang('admin::app.components.layouts.header.mega-search.title')" 
+                    placeholder="@lang('admin::app.components.layouts.header.mega-search.title')"
                 >
             </div>
         </v-mega-search>
@@ -52,23 +52,23 @@
             </div>
         </v-dark>
 
-        <a 
-            href="{{ route('shop.home.index') }}" 
+        {{-- <a
+            href="{{ route('shop.home.index') }}"
             target="_blank"
             class="flex"
         >
-            <span 
+            <span
                 class="icon-store p-1.5 rounded-md text-2xl cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
                 title="@lang('admin::app.components.layouts.header.visit-shop')"
             >
             </span>
-        </a>
+        </a> --}}
 
        <!-- Notification Component -->
         <v-notifications {{ $attributes }}>
             <span class="flex relative">
-                <span 
-                    class="icon-notification p-1.5 rounded-md text-2xl cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950" 
+                <span
+                    class="icon-notification p-1.5 rounded-md text-2xl cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
                     title="@lang('admin::app.components.layouts.header.notifications')"
                 >
                 </span>
@@ -173,7 +173,7 @@
                             class="flex gap-2.5 p-1.5 items-center cursor-pointer {{ $menu->getActive($menuItem) == 'active' ? 'bg-blue-600 rounded-lg' : ' hover:bg-gray-100 dark:hover:bg-gray-950 ' }} peer"
                         >
                             <span class="{{ $menuItem['icon'] }} text-2xl {{ $menu->getActive($menuItem) ? 'text-white' : ''}}"></span>
-                            
+
                             <p class="text-gray-600 dark:text-gray-300 font-semibold whitespace-nowrap {{ $menu->getActive($menuItem) ? 'text-white' : ''}}">
                                 @lang($menuItem['name'])
                             </p>
@@ -203,7 +203,7 @@
         <div class="flex items-center relative w-[525px] max-w-[525px] ltr:ml-2.5 rtl:mr-2.5 max-lg:w-[400px]">
             <i class="icon-search text-2xl flex items-center absolute ltr:left-3 rtl:right-3 top-1.5"></i>
 
-            <input 
+            <input
                 type="text"
                 class="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-lg block w-full px-10 py-1.5 leading-6 text-gray-600 dark:text-gray-300 transition-all hover:border-gray-400 dark:hover:border-gray-400 focus:border-gray-400 dark:focus:border-gray-400 peer"
                 :class="{'border-gray-400': isDropdownOpen}"
@@ -251,7 +251,7 @@
                                     >
                                         <template v-if="! product.images.length">
                                             <img src="{{ bagisto_asset('images/product-placeholders/front.svg') }}">
-                                        
+
                                             <p class="w-full absolute bottom-1.5 text-[6px] text-gray-400 text-center font-semibold">
                                                 @lang('admin::app.catalog.products.edit.types.grouped.image-placeholder')
                                             </p>
@@ -447,19 +447,19 @@
                             is_active: true,
                             endpoint: "{{ route('admin.catalog.products.search') }}"
                         },
-                        
+
                         orders: {
                             key: 'orders',
                             title: "@lang('admin::app.components.layouts.header.mega-search.orders')",
                             endpoint: "{{ route('admin.sales.orders.search') }}"
                         },
-                        
+
                         categories: {
                             key: 'categories',
                             title: "@lang('admin::app.components.layouts.header.mega-search.categories')",
                             endpoint: "{{ route('admin.catalog.categories.search') }}"
                         },
-                        
+
                         customers: {
                             key: 'customers',
                             title: "@lang('admin::app.components.layouts.header.mega-search.customers')",
@@ -509,7 +509,7 @@
                     let self = this;
 
                     this.isLoading = true;
-                    
+
                     this.$axios.get(this.tabs[this.activeTab].endpoint, {
                             params: {query: this.searchTerm}
                         })
@@ -537,11 +537,11 @@
             <x-slot:toggle>
                 <span class="flex relative">
                     <span
-                        class="icon-notification p-1.5 rounded-md text-2xl text-red cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950" 
+                        class="icon-notification p-1.5 rounded-md text-2xl text-red cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
                         title="@lang('admin::app.components.layouts.header.notifications')"
                     >
                     </span>
-                
+
                     <span
                         class="flex justify-center items-center min-w-5 h-5 absolute -top-2 p-1.5 ltr:left-5 rtl:right-5 bg-blue-600 rounded-full text-white text-[10px] font-semibold leading-[9px] cursor-pointer"
                         v-text="totalUnRead"
